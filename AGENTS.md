@@ -983,3 +983,16 @@ not the specific names.
 
 Reviewers should reject new change-detector tests; authors should convert
 them into invariants before re-requesting review.
+
+---
+
+## Cursor Cloud specific instructions
+
+Cloud Agent machines already have the repo dependencies after `install`. Use these entry points:
+
+- Python 3.11 is in `.venv`. `source .venv/bin/activate` before `hermes` or `python`. `hermes` is also linked at `/usr/local/bin/hermes`.
+- Tests: `scripts/run_tests.sh` (hermetic env, 4 workers). Do not call `pytest` directly. `scripts/run_tests.sh tests/cron` is a fast product check; `scripts/run_tests.sh tests/hermes_cli tests/agent` covers the CLI and agent core.
+- Dashboard: `hermes dashboard --host 127.0.0.1 --port 9119 --no-open`. The UI is served from `hermes_cli/web_dist`. If that directory is missing, the dashboard builds it (`npm run build` in `web/`).
+- TUI tests: `cd ui-tui && npm test`. `@hermes/ink` is imported from `ui-tui/packages/hermes-ink/dist`, which `npm run build --prefix ui-tui/packages/hermes-ink` produces. The Cloud Agent install runs that build.
+- No provider API keys are installed. `hermes doctor`, the dashboard, and the test suite run without them. `hermes chat` needs a key in `~/.hermes/.env`.
+- PID 1 is not systemd. User-service gateway install (`hermes gateway install`) cannot enable linger here. Run the gateway in the foreground with `hermes gateway run`.
